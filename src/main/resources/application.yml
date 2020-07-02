@@ -1,0 +1,128 @@
+
+
+jdbc:
+  jdbctype: mysql
+  url: jdbc:mysql://172.18.9.70:3306/devhr_test_up_hr
+  username: mc_devhr_test_up
+  password: mc_devhr_test_up
+# 循环次数
+template:
+  cycles: 100
+# 启用业务功能
+sqltemplate:
+  conf: onbrdfinish
+# 导入(import)or删除(delete)
+operation:
+  conf: delete
+
+#不要动
+paramconfig:
+  onbrdfinish:
+    # 人员初始id
+    startPersonId: 2000000000000
+    # 多语言表数据id
+    startLangId: 2000000000000
+    # 人员识别标识，如离职使用 'Q'
+    personFlag: 'Q'
+    # 生成人员总数量
+    personNums: 100000
+    step: 100
+    startMobileNum: 17700000000
+    # 部门id初始值
+    startAAdminorgId: 10000000000
+    # 部门生成数：10万
+    adminorgNums: 100000
+    # 岗位初始id
+    startAPosId: 100000000000
+    # 岗位总数
+    positionNums: 100000
+    startCertNumber: 100000000000
+    startEmpNumber: 100000000000
+    startBillno: 100000000000
+    startBarCode: 100000000000
+
+    fconbillno: 100000000000
+    fconbarcode: 100000000000
+  company:
+    #初始值
+    startAdminorgId: 10000000000
+    #id增长步长
+    step: 100
+    #
+    adminorgRootId: 100000
+    #公司生成数
+    adminorgNums: 100
+    #root number
+    rootNum: '00'
+  department:
+    #公司id初始值
+    startAdminorgId: 10000000000
+    #部门id初始值比公司多10倍
+    startDepartmentId: 100000000000
+    #id增长步长
+    step: 100
+    #公司生成数量
+    companyNums: 100
+    #部门生成数
+    departmentNums: 100000
+    #root number
+    rootNum: '00'
+  quit:
+    startPersonId: 2000000000000
+    step: 100
+    personNums: 100000
+    # 部门id初始值
+    startBAdminorgId: 10000000000
+    # 部门生成数：10万
+    adminorgNums: 100000
+    # 公司id初始值
+    startBCompanyId: 10000000000
+    # 公司生成数：100个
+    companyNums: 100
+    # 岗位初始id
+    startBPosId: 100000000000
+    # 岗位总数
+    positionNums: 100000
+    startCertNumber: 100000000000
+    startBillno: 100000000000
+    startBarCode: 100000000000
+    # 多语言表数据id
+    startLangId: 1000000000000
+    fuserid: 100015
+  position:
+    startPositionId: 100000000000
+    step: 100
+    # 公司id初始值
+    startCompanyId: 10000000000
+    # 部门id初始值
+    startDepartmentId: 100000000000
+    # 生成岗位数
+    positionNums: 100000
+    # 生成部门数
+    departmentNums: 100000
+    # 生成公司数
+    companyNums: 100
+  stdonbrd:
+    startPersonId: 100000000000
+    # 生成人员总数量
+    personNums: 100000
+    step: 100
+    startMobileNum: 13500000000
+    # 部门id初始值
+    startAAdminorgId: 10000000000
+    # 部门生成数：10万
+    adminorgNums: 100000
+    startACompanyId: 10000000000
+    companyNums: 100
+    # 岗位初始id
+    startAPosId: 100000000000
+    # 岗位总数
+    positionNums: 100000
+    startCertNumber: 100000000000
+    startEmpNumber: 100000000000
+    startBillno: 100000000000
+    startBarCode: 100000000000
+    # 多语言表数据id
+    startLangId: 100000000000
+    fconbillno: 100000000000
+    fconbarcode: 100000000000
