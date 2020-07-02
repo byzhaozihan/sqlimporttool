@@ -1,4 +1,4 @@
-package com.example.sqlimporttool.importDb;
+package com.example.sqlimporttool.importdb;
 
 import com.example.sqlimporttool.createsql.sqltemplate.sqlparser.TemplateSQLParser;
 
@@ -13,33 +13,37 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 执行sql构造及IO的线程
+ *
+ * @author zzh
+ */
 public class DataTask implements Runnable {
 
-    private TemplateSQLParser templateSQLParser;
+    private final static Integer TIMEOUT_QUEUE_OFFER = 5;
 
-    private String action;
+    private final TemplateSQLParser templateSqlParser;
 
-    private LinkedBlockingQueue<List<SingleSqlInfo>> dataQueue;
+    private final String action;
 
-    private CountDownLatch countDown;
+    private final LinkedBlockingQueue<List<SingleSqlInfo>> dataQueue;
 
-    private Connection connection;
+    private final CountDownLatch countDown;
 
-    private Integer cycles;
+    private final Connection connection;
+
+    private final Integer cycles;
 
 
     public DataTask(String action, LinkedBlockingQueue<List<SingleSqlInfo>> temData,
                     CountDownLatch countDown, Connection connection,
-                    TemplateSQLParser templateSQLParser, Integer cycles) {
+                    TemplateSQLParser templateSqlParser, Integer cycles) {
         this.action = action;
         this.dataQueue = temData;
         this.countDown = countDown;
         this.connection = connection;
-        this.templateSQLParser = templateSQLParser;
+        this.templateSqlParser = templateSqlParser;
         this.cycles = cycles;
-    }
-
-    public DataTask() {
     }
 
     @Override
@@ -62,7 +66,7 @@ public class DataTask implements Runnable {
         try {
             String path = System.getProperty("user.dir");
             File sqlFile = new File(path, "/sql/hers_onbrdfinish_delete.sql");
-            templateSQLParser.parseDeleteSQLData(sqlFile.getPath(), this);
+            templateSqlParser.parseDeleteSQLData(sqlFile.getPath(), this);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -74,7 +78,7 @@ public class DataTask implements Runnable {
         try {
             String path = System.getProperty("user.dir");
             File sqlFile = new File(path, "/sql/hers_onbrdfinish_insert.sql");
-            templateSQLParser.parseInsertSQLData(sqlFile.getPath(), cycles, this);
+            templateSqlParser.parseInsertSQLData(sqlFile.getPath(), cycles, this);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -88,8 +92,8 @@ public class DataTask implements Runnable {
      */
     public void createData(List<SingleSqlInfo> unitData) {
         try {
-            if (!dataQueue.offer(unitData, 30, TimeUnit.MINUTES)) {
-                System.out.println("队列已满且30分钟都无法插入队列，需要排查IO线程问题");
+            if (!dataQueue.offer(unitData, TIMEOUT_QUEUE_OFFER, TimeUnit.MINUTES)) {
+                System.out.println("队列已满且5分钟都无法插入队列，需要排查IO线程问题");
                 countDown.countDown();
             }
         } catch (InterruptedException e) {
@@ -106,7 +110,8 @@ public class DataTask implements Runnable {
         System.out.println(new Date());
 
         try {
-            boolean threadInterupt = false;//构建线程是否罢工
+            //构建线程是否罢工
+            boolean threadInterupt = false;
             int timeout = 0;
             while (!threadInterupt) {
                 List<SingleSqlInfo> billData;
@@ -115,7 +120,8 @@ public class DataTask implements Runnable {
                     threadInterupt = true;
                 }
                 if (!threadInterupt) {
-                    billData = dataQueue.poll(2, TimeUnit.SECONDS);//尝试去一条看看有没有数据
+                    //尝试去一条看看有没有数据
+                    billData = dataQueue.poll(2, TimeUnit.SECONDS);
                     if (billData == null) {
                         timeout++;
                         continue;
@@ -133,10 +139,10 @@ public class DataTask implements Runnable {
             //要么构建线程出问题，要么已经没有解析的数据
             System.out.println("导入数据完成，当前时间为：");
             System.out.println(new Date());
-            countDown.countDown();
         } catch (InterruptedException e) {
-            countDown.countDown();
             e.printStackTrace();
+        } finally {
+            countDown.countDown();
         }
     }
 

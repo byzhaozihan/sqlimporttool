@@ -10,8 +10,8 @@ import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.util.JdbcConstants;
 import com.example.sqlimporttool.createsql.sqltemplate.paramrule.IParamValueConfigure;
-import com.example.sqlimporttool.importDb.DataTask;
-import com.example.sqlimporttool.importDb.SingleSqlInfo;
+import com.example.sqlimporttool.importdb.DataTask;
+import com.example.sqlimporttool.importdb.SingleSqlInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

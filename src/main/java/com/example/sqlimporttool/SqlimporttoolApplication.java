@@ -1,9 +1,9 @@
 package com.example.sqlimporttool;
 
 import com.example.sqlimporttool.createsql.sqltemplate.sqlparser.TemplateSQLParser;
-import com.example.sqlimporttool.importDb.AppService;
-import com.example.sqlimporttool.importDb.DataTask;
-import com.example.sqlimporttool.importDb.SingleSqlInfo;
+import com.example.sqlimporttool.importdb.AppService;
+import com.example.sqlimporttool.importdb.DataTask;
+import com.example.sqlimporttool.importdb.SingleSqlInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +16,8 @@ import java.sql.DriverManager;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @SpringBootApplication
@@ -42,7 +44,7 @@ public class SqlimporttoolApplication {
     AppService appService;
 
     @Autowired
-    private TemplateSQLParser templateSQLParser;
+    private TemplateSQLParser templateSqlParser;
 
     @PostConstruct
     public void boot() {
@@ -58,7 +60,7 @@ public class SqlimporttoolApplication {
             Assert.notNull(conn2, "connection2 is null !!!");
             Assert.notNull(conn3, "connection3 is null !!!");
 
-            if (operation.toLowerCase().equals("delete")) {
+            if ("delete".equals(operation.toLowerCase())) {
                 deleteData();
             } else {
                 appService.run(conn1, conn2, conn3);
@@ -71,6 +73,7 @@ public class SqlimporttoolApplication {
 
     private void deleteData() {
         try {
+            ExecutorService executorService = Executors.newFixedThreadPool(2);
             Connection conn = DriverManager.getConnection(url, username, password);
             CountDownLatch countDown = new CountDownLatch(2);
 
@@ -78,11 +81,12 @@ public class SqlimporttoolApplication {
             LinkedBlockingQueue<List<SingleSqlInfo>> temData = new LinkedBlockingQueue<>(1500);
             System.out.println("删除数据开始执行-----");
             System.out.println(new Date());
-            new Thread(new DataTask("deleteData", temData, countDown, null, templateSQLParser, 1)).start();
-            new Thread(new DataTask("importData", temData, countDown, conn, null, null)).start();
+            executorService.execute(new DataTask("deleteData", temData, countDown, null, templateSqlParser, 1));
+            executorService.execute(new DataTask("importData", temData, countDown, conn, null, null));
             countDown.await();
             System.out.println("删除数据完成");
             System.out.println(new Date());
+            executorService.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package com.example.sqlimporttool.importDb;
+package com.example.sqlimporttool.importdb;
 
 public class SingleSqlInfo {
 
