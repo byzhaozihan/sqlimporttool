@@ -59,9 +59,9 @@ public class DataTask implements Runnable {
     }
 
     private void deleteData() {
-        String path = System.getProperty("user.dir");
-        File sqlFile = new File(path, "hers_onbrdfinish_delete.sql");
         try {
+            String path = System.getProperty("user.dir");
+            File sqlFile = new File(path, "/sql/hers_onbrdfinish_delete.sql");
             templateSQLParser.parseDeleteSQLData(sqlFile.getPath(), this);
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,9 +71,9 @@ public class DataTask implements Runnable {
     }
 
     private void batchSet() {
-        String path = System.getProperty("user.dir");
-        File sqlFile = new File(path, "hers_onbrdfinish_insert.sql");
         try {
+            String path = System.getProperty("user.dir");
+            File sqlFile = new File(path, "/sql/hers_onbrdfinish_insert.sql");
             templateSQLParser.parseInsertSQLData(sqlFile.getPath(), cycles, this);
         } catch (Exception e) {
             e.printStackTrace();
