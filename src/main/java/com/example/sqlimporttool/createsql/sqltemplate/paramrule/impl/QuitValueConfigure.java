@@ -3,6 +3,8 @@ package com.example.sqlimporttool.createsql.sqltemplate.paramrule.impl;
 import com.example.sqlimporttool.createsql.sqltemplate.paramrule.IParamValueConfigure;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,20 +83,24 @@ public class QuitValueConfigure implements IParamValueConfigure {
     @Value("${paramconfig.quit.fuserid}")
     private Long fuserid;
 
-    //TODO:
-    private Long[] existedOrgIds = new Long[]{100000L, 100001L, 100002L, 100003L,
-            100004L, 100005L, 100006L, 100007L, 100008L, 100009L};
+    private Long[] existedOrgIds = new Long[]{687395562785352704L,687395907917851648L,687396149836918784L,
+            687396686170959872L,687397112664566784L,687397370379381760L,687397961205820416L,687398324331883520L,
+            687398563340103680L,687398892089651200L,687399153260571648L,687399323448651776L,687399567959796736L,
+            687399802102624256L,687400124862705664L,687400272846138368L,687400608348516352L,692501230861156352L,
+            692501233360961536L,692658788255137792L};
     private Function<int[], Object> getOrgId = p -> {
         int count = p[0];
-        return (count + 1) % 56;
+        return existedOrgIds[count % existedOrgIds.length];
     };
 
-    //TODO:
-    private Long[] existHRBUId = new Long[]{100000L, 100001L, 100002L, 100003L,
-            100004L, 100005L, 100006L, 100007L, 100008L, 100009L};
+    private Long[] existHRBUId = new Long[]{687395562785352704L,687395907917851648L,687396149836918784L,
+            687396686170959872L,687397112664566784L,687397370379381760L,687397961205820416L,687398324331883520L,
+            687398563340103680L,687398892089651200L,687399153260571648L,687399323448651776L,687399567959796736L,
+            687399802102624256L,687400124862705664L,687400272846138368L,687400608348516352L,692501230861156352L,
+            692501233360961536L,692658788255137792L};
     private Function<int[], Object> getHRBUId = p -> {
         int count = p[0];
-        return (count + 1) % 56;
+        return existHRBUId[count % existHRBUId.length];
     };
 
     private Function<int[], Object> getPersonId = p -> startPersonId + p[0] * step;
@@ -128,7 +134,7 @@ public class QuitValueConfigure implements IParamValueConfigure {
         // 平均每个公司的部门数
         long avgAdminNum = adminorgNums / companyNums;
         // 确定部门对应的公司
-        long location = differAdminorg / avgAdminNum;
+        long location = (differAdminorg / step) / avgAdminNum;
         return startBCompanyId + location * step;
     };
 
@@ -145,7 +151,7 @@ public class QuitValueConfigure implements IParamValueConfigure {
 
     private Function<int[], Object> getAPosId = p -> getBPosId.apply(p);
 
-    private Function<int[], Object> getCreatorId = p -> String.valueOf(fuserid);
+    private Function<int[], Object> getCreatorId = p -> fuserid;
 
     /**
      * 最近两年内的均匀分布的时间，以天为间隔
@@ -153,7 +159,7 @@ public class QuitValueConfigure implements IParamValueConfigure {
     private Function<int[], Object> getUniformTimeLast2Year = p -> {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_YEAR, -p[0] % (365 * 2));
-        return calendar.getTime();
+        return new Timestamp(calendar.getTime().getTime());
     };
 
     // 删除执行的字段值

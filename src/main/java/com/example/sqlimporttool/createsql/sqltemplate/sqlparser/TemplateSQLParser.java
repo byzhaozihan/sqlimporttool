@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -110,14 +111,8 @@ public class TemplateSQLParser {
                 case "SQLDateExpr":
                     SQLDateExpr dateExpr = (SQLDateExpr) value;
                     String dateStr = dateExpr.getValue();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date date = null;
-                    try {
-                        date = dateFormat.parse(dateStr);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    paramValues[i] = date;
+                    Timestamp timestamp = getTimestamp(dateStr);
+                    paramValues[i] = timestamp;
                     break;
                 case "SQLIntegerExpr":
                     SQLIntegerExpr integerExpr = (SQLIntegerExpr) value;
@@ -127,6 +122,11 @@ public class TemplateSQLParser {
                 case "SQLCharExpr":
                     SQLCharExpr sqlExpr = (SQLCharExpr) value;
                     String paramValue = sqlExpr.getValue().toString();
+                    if (isDate(paramValue)) {
+                        Timestamp timestamp2 = getTimestamp(paramValue);
+                        paramValues[i] = timestamp2;
+                        break;
+                    }
                     Object fieldValue = getFieldValue(paramValue, params);
                     paramValues[i] = fieldValue;
                     break;
@@ -139,6 +139,31 @@ public class TemplateSQLParser {
             }
         }
         return paramValues;
+    }
+
+    private Timestamp getTimestamp(String dateStr) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Timestamp(date.getTime());
+    }
+
+    private boolean isDate(String paramValue) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        if (paramValue.trim().isEmpty()) {
+            return false;
+        }
+        String dateStr = paramValue.split(" ")[0];
+        try {
+            sdf.parse(dateStr);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
     /**

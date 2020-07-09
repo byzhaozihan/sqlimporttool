@@ -62,7 +62,7 @@ public class PositionValueConfigure implements IParamValueConfigure {
     private Function<int[], Object> getCompanyId = p -> {
         Long departmentIds = (Long) getAdminorgId.apply(p);
         long depNums = departmentIds - startDepartmentId;
-        return startCompanyId + ((depNums / (departmentNums / companyNums)) * step);
+        return startCompanyId + (depNums / (departmentNums / companyNums));
     };
 
     // 删除执行的字段值

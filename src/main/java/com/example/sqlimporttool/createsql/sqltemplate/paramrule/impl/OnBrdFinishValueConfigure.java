@@ -17,6 +17,7 @@ public class OnBrdFinishValueConfigure implements IParamValueConfigure {
         valuesMap.put("#FPERSONID", getPersonId);
         valuesMap.put("#FHRBUID", getHRBUId);
         valuesMap.put("#FAADMINORGID", getAAdminorgId);
+        valuesMap.put("#FACOMPANYID", getACompanyId);
         valuesMap.put("#FEMPNUMBER", getEmpNumber);
         valuesMap.put("#FCERTIFICATENUMBER", getCertificateNumber);
         valuesMap.put("#FNAME", getName);
@@ -57,6 +58,12 @@ public class OnBrdFinishValueConfigure implements IParamValueConfigure {
     // 部门生成数：10万
     @Value("${paramconfig.onbrdfinish.adminorgNums}")
     private Long adminorgNums;
+    // 公司id初始值
+    @Value("${paramconfig.onbrdfinish.startACompanyId}")
+    private Long startACompanyId;
+    // 公司生成数：100个
+    @Value("${paramconfig.onbrdfinish.companyNums}")
+    private Long companyNums;
     // 岗位初始id
     @Value("${paramconfig.onbrdfinish.startAPosId}")
     private Long startAPosId;
@@ -84,21 +91,27 @@ public class OnBrdFinishValueConfigure implements IParamValueConfigure {
 
     private Function<int[], Object> getPersonId = p -> startPersonId + p[0] * step;
     private Function<int[], Object> getMobile = p -> String.valueOf(startMobileNum++);
-    //TODO:
-    private Long[] existedOrgIds = new Long[]{100000L, 100001L, 100002L, 100003L,
-            100004L, 100005L, 100006L, 100007L, 100008L, 100009L};
+
+    private Long[] existedOrgIds = new Long[]{687395562785352704L,687395907917851648L,687396149836918784L,
+            687396686170959872L,687397112664566784L,687397370379381760L,687397961205820416L,687398324331883520L,
+            687398563340103680L,687398892089651200L,687399153260571648L,687399323448651776L,687399567959796736L,
+            687399802102624256L,687400124862705664L,687400272846138368L,687400608348516352L,692501230861156352L,
+            692501233360961536L,692658788255137792L};
     private Function<int[], Object> getOrgId = p -> {
         int count = p[0];
-        return (count + 1) % 56;
+        return existedOrgIds[count % existedOrgIds.length];
     };
 
-    //TODO:
-    private Long[] existHRBUId = new Long[]{100000L, 100001L, 100002L, 100003L,
-            100004L, 100005L, 100006L, 100007L, 100008L, 100009L};
+    private Long[] existHRBUId = new Long[]{687395562785352704L,687395907917851648L,687396149836918784L,
+            687396686170959872L,687397112664566784L,687397370379381760L,687397961205820416L,687398324331883520L,
+            687398563340103680L,687398892089651200L,687399153260571648L,687399323448651776L,687399567959796736L,
+            687399802102624256L,687400124862705664L,687400272846138368L,687400608348516352L,692501230861156352L,
+            692501233360961536L,692658788255137792L};
     private Function<int[], Object> getHRBUId = p -> {
         int count = p[0];
-        return (count + 1) % 56;
+        return existHRBUId[count % existHRBUId.length];
     };
+
 
     private Function<int[], Object> getAAdminorgId = p -> {
         int count = p[0];
@@ -109,6 +122,24 @@ public class OnBrdFinishValueConfigure implements IParamValueConfigure {
             return startAAdminorgId + (count / avgPerNum) * step;
         }
         return startAAdminorgId;
+    };
+
+    /**
+     * 使用部门id来确定公司id
+     */
+    private Function<int[], Object> getACompanyId = p -> {
+        // 获取人员的部门id
+        Long adminorgId = (Long) getAAdminorgId.apply(p);
+        // 部门增加的数量
+        long differAdminorg = adminorgId - startAAdminorgId;
+        if (differAdminorg == 0) {
+            return startACompanyId;
+        }
+        // 平均每个公司的部门数
+        long avgAdminNum = adminorgNums / companyNums;
+        // 确定部门对应的公司
+        long location = (differAdminorg / step) / avgAdminNum;
+        return startACompanyId + location * step;
     };
 
     private Function<int[], Object> getAPosId = p -> {
